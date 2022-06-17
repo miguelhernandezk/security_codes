@@ -1,10 +1,13 @@
 import React from "react";
 import {Loading} from "./Loading";
 
+const SECURITY_CODE = "paradigma";
+
 class ClassState extends React.Component{
     constructor(props){
         super(props);
         this.state = {
+            value: "",
             error: false,
             loading: false,
         };
@@ -24,7 +27,11 @@ class ClassState extends React.Component{
             setTimeout(() => {
                 console.log("Validating code");
 
-                this.setState({loading: false});
+                if(SECURITY_CODE === this.state.value){
+                    this.setState({error: false, loading: false});
+                }else{
+                    this.setState({error: true, loading: false})
+                }
 
                 console.log("Completed");
             }, 3000);
@@ -37,7 +44,7 @@ class ClassState extends React.Component{
                 <h2>Delete {this.props.name}</h2>
                 <p>Please, write the secutiry code:</p>
 
-                {this.state.error && (
+                {(this.state.error && !this.state.loading)&& (
                     <p>Error: Incorrect code</p>
                 )}
 
@@ -45,7 +52,13 @@ class ClassState extends React.Component{
                    <Loading />
                 )}
 
-                <input placeholder="Security code"/>
+                <input 
+                    placeholder="Security code"
+                    value={this.state.value}
+                    onChange={(event) => {
+                        this.setState({ value: event.target.value });
+                    }}
+                />
                 <button
                     onClick={() => 
                         this.setState({loading: true})
