@@ -16,10 +16,14 @@ function UseState({ name }){
                 console.log("Validating code");
 
 
-                if(value !== SECURITY_CODE){
+                if(value === SECURITY_CODE){
+                    setLoading(false);
+                    setError(false); // Should be combined with A
+                }else{
                     setError(true);
+                    setLoading(false);
                 }
-                setLoading(false);
+                
 
                 console.log("Completed");
             }, 3000)
@@ -33,7 +37,7 @@ function UseState({ name }){
             <h2>Delete { name }</h2>
             <p>Please, write the secutiry code:</p>
 
-            {error && (
+            {(error && !loading) && (  // A:  This works without updating the state
                 <p>Error: Incorrect code</p>
             )}
 
@@ -46,11 +50,17 @@ function UseState({ name }){
                 value = {value}
                 placeholder="Security code"
                 onChange={(event) =>{
+                    // setError(false); // It can be updated here bt it will disappear when users enters something into the input.
                     setValue(event.target.value);
                 }}
             />
             <button
-                onClick={() => setLoading(true)}
+                onClick={() => 
+                    {
+                        setLoading(true);
+                        // setError(false); // This works fine
+                    }
+                }
             >Let's go!</button>
         </div>
     );
