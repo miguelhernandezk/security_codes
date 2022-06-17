@@ -1,8 +1,13 @@
 import React from "react";
 
+const SECURITY_CODE = "paradigma";
+
 function UseState({ name }){
+    const [value, setValue] = React.useState("");
     const [error, setError] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
+
+    console.log(value);
 
     React.useEffect(() => {
         console.log("Starting effect");
@@ -10,6 +15,10 @@ function UseState({ name }){
             setTimeout(() => {
                 console.log("Validating code");
 
+
+                if(value !== SECURITY_CODE){
+                    setError(true);
+                }
                 setLoading(false);
 
                 console.log("Completed");
@@ -33,10 +42,15 @@ function UseState({ name }){
             )}
 
 
-            <input placeholder="Security code"/>
+            <input 
+                value = {value}
+                placeholder="Security code"
+                onChange={(event) =>{
+                    setValue(event.target.value);
+                }}
+            />
             <button
                 onClick={() => setLoading(true)}
-
             >Let's go!</button>
         </div>
     );
