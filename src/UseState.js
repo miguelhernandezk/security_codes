@@ -11,6 +11,53 @@ function UseState({ name }){
         confirmed: false,
     });
 
+    const onConfirm = () => {
+        setState({ // Work as in classes (NOT independent states)
+            ...state,
+            loading: false,
+            error: false,
+            confirmed: true,
+        });
+    };
+
+    const onWrite = (newValue) =>  {
+        setState({
+            ...state,
+            value: newValue,
+        })
+    };
+
+    const onError = () => {
+        setState({
+            ...state,
+            loading: false,
+            error: true,
+        });
+    };
+
+    const onCheck = () => {
+        setState({
+            ...state,
+            loading: true,
+        });
+    }
+
+    const onDelete = () =>{
+        setState({
+            ...state,
+            deleted: true,
+        });
+    };
+
+    const onReset = () => {
+        setState({
+            ...state,
+            confirmed: false,
+            deleted: false,
+            value: "",
+        });
+    }; 
+
     React.useEffect(() => {
         console.log("Starting effect");
         if(!!state.loading) {// React detecs as a change the first render, thus setting loading to true        
@@ -19,19 +66,10 @@ function UseState({ name }){
 
 
                 if(state.value === SECURITY_CODE){
-                    setState({ // Work as in classes (NOT independent states)
-                        ...state,
-                        loading: false,
-                        error: false,
-                        confirmed: true,
-                    });
+                    onConfirm();
                     // setError(false); // Should be combined with A
                 }else{
-                    setState({
-                        ...state,
-                        loading: false,
-                        error: true,
-                    });
+                   onError(); 
                 }
                 
 
@@ -60,19 +98,14 @@ function UseState({ name }){
                     value = {state.value}
                     placeholder="Security code"
                     onChange={(event) =>{
-                        setState({
-                            ...state,
-                            value: event.target.value,
-                        });
-                    }}
+                            onWrite(event.target.value);
+                        }
+                    }
                 />
                 <button
                     onClick={() => 
                         {
-                            setState({
-                                ...state,
-                                loading: true,
-                            });
+                            onCheck();
                         }
                     }
                 >Let's go!</button>
@@ -84,20 +117,13 @@ function UseState({ name }){
                 <p>Are you sure you want to delete UseState?</p>
                 <button
                     onClick={() => {
-                        setState({
-                            ...state,
-                            deleted: true,
-                        })
+                        onDelete();
                     }}
                 >
                     Yes, delete!</button>
                 <button
                     onClick={() => {
-                        setState({
-                            ...state,
-                            confirmed: false,
-                            value: "",
-                        })
+                        onReset();
                     }}
                 >
                     Nope, I changed my mind</button>
@@ -109,12 +135,7 @@ function UseState({ name }){
                 <p>Element deleted</p>
                 <button
                     onClick={() => {
-                        setState({
-                            ...state,
-                            confirmed: false,
-                            deleted: false,
-                            value: "",
-                        })
+                        onReset();
                     }}
                 >
                     Reset UseState</button>
