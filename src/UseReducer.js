@@ -3,53 +3,30 @@ import React from "react";
 const SECURITY_CODE = "paradigma";
 
 function UseReducer({ name }){
-    const [state, setState] = React.useReducer(reducer, initialState);
+    const [state, dispatch] = React.useReducer(reducer, initialState);
 
     const onConfirm = () => {
-        setState({ // Work as in classes (NOT independent states)
-            ...state,
-            loading: false,
-            error: false,
-            confirmed: true,
-        });
+        dispatch({type: actionTypes.confirm});
     };
 
     const onWrite = (newValue) =>  {
-        setState({
-            ...state,
-            value: newValue,
-        })
+        dispatch({type: actionTypes.write, payload: newValue});
     };
 
     const onError = () => {
-        setState({
-            ...state,
-            loading: false,
-            error: true,
-        });
+        dispatch({type: actionTypes.error});
     };
 
     const onCheck = () => {
-        setState({
-            ...state,
-            loading: true,
-        });
+        dispatch({type: actionTypes.check});
     }
 
     const onDelete = () =>{
-        setState({
-            ...state,
-            deleted: true,
-        });
+        dispatch({type: actionTypes.delete});
     };
 
     const onReset = () => {
-        setState({
-            ...state,
-            confirmed: false,
-            deleted: false,
-            value: "",
-        });
+        dispatch({type: actionTypes.reset});
     }; 
 
     React.useEffect(() => {
@@ -63,7 +40,7 @@ function UseReducer({ name }){
                     onConfirm();
                     // setError(false); // Should be combined with A
                 }else{
-                   onError(); 
+                    onError();
                 }
                 
 
@@ -93,15 +70,12 @@ function UseReducer({ name }){
                     placeholder="Security code"
                     onChange={(event) =>{
                             onWrite(event.target.value);
+                            // onWrite(event.target.value);
                         }
                     }
                 />
                 <button
-                    onClick={() => 
-                        {
-                            onCheck();
-                        }
-                    }
+                    onClick={onCheck}
                 >Let's go!</button>
             </div>
         );
@@ -110,15 +84,11 @@ function UseReducer({ name }){
             <React.Fragment>
                 <p>Are you sure you want to delete UseState?</p>
                 <button
-                    onClick={() => {
-                        onDelete();
-                    }}
+                    onClick={onDelete}
                 >
                     Yes, delete!</button>
                 <button
-                    onClick={() => {
-                        onReset();
-                    }}
+                    onClick={onReset}
                 >
                     Nope, I changed my mind</button>
             </React.Fragment>
@@ -128,9 +98,7 @@ function UseReducer({ name }){
             <React.Fragment>
                 <p>Element deleted</p>
                 <button
-                    onClick={() => {
-                        onReset();
-                    }}
+                    onClick={ onReset }
                 >
                     Reset UseState</button>
             </React.Fragment>
@@ -146,68 +114,51 @@ const initialState = {
     confirmed: false,
 };
 
-// Thre forms of creating a reducer
-
-// const reducer = (state, action) => {
-// }
-
-// 1. 
-const reducerIf = (state, action) => { // action is an object
-    if(action.type === "ERROR" ){
-        return {
-            ...state,
-            error: true,
-            loading: false,
-            };
-        }else if (action.type === "CHECK"){
-            return {
-                ...state,
-                loading: true,
-            };     
-        }else {
-            return{
-                ...state,
-            };
-    }
-};
-
-// 2. 
-const reducerSwitch = (state, action) => { // action is an object
-    switch(action.type){
-        case "ERROR":
-            return{
-                ...state,
-                error: true,
-                loading: false,
-            }; // "break" is not needes since we ar eusing return
-        case "CHECK":
-            return{
-                ...state,
-                loading: true,
-            };
-        default:
-            return{
-                ...state,
-            };
-    }
-};
+const actionTypes = {
+    confirm: "CONFIRM",
+    write: "WRITE",
+    delete: "DELETE",
+    error: "ERROR",
+    reset: "RESET",
+    check: "CHECK",
+}
 
 // 3. 
-const reducerObject = (state) => ({ // action is an object
-    "ERROR": {
+const reducerObject = (state, payload) => ({ // action is an object
+    [actionTypes.error]: {
         ...state,
         error: true,
         loading: false,
     },
-    "CHECK": {
+    [actionTypes.check]: {
         ...state,
         loading: true,
+    },
+    [actionTypes.confirm]: {
+        ...state,
+        loading: false,
+        error: false,
+        confirmed: true,
+    },
+    [actionTypes.write]: {
+        ...state,
+        value: payload,
+    },
+    [actionTypes.delete]: {
+        ...state,
+        deleted: true,
+    },
+    [actionTypes.reset]: {
+        ...state,
+        confirmed: false,
+        deleted: false,
+        value: "",
     }
 });
 
 const reducer = (state, action) => {
     if(reducerObject(state)[action.type]){// Asks if there is an object called as "action.type" inside reducerObject
-        return reducerObject(state)[action.type]
+        return reducerObject(state, action.payload)[action.type]
     } else{
         return state;
     }
